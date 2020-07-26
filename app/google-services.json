@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "746343146245",
+    "firebase_url": "https://loveactuallyme-de309.firebaseio.com",
+    "project_id": "loveactuallyme-de309",
+    "storage_bucket": "loveactuallyme-de309.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746343146245:android:b83985f42ce7697444cd6c",
+        "android_client_info": {
+          "package_name": "com.shreyans.poddar.loveactuallyme"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "746343146245-235lof4uggu2ktes9ug8gbcm8l61v66i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkOqiWGWNQQZ1Hvo6AziwoJasups3GTMw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "746343146245-235lof4uggu2ktes9ug8gbcm8l61v66i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
