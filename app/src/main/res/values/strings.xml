@@ -1,5 +1,4 @@
 <resources>
     <string name="app_name">LoveActuallyMe</string>
-    <string name="facebook_app_id">2650472575225954</string>
-    <string name="fb_login_protocol_scheme">fb2650472575225954</string>
+
 </resources>
