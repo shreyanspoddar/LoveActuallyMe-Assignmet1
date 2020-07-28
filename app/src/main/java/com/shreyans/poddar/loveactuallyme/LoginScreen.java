@@ -13,6 +13,15 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.internal.metrics.Tag;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -22,9 +31,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 
 public class LoginScreen extends AppCompatActivity {
@@ -37,6 +50,10 @@ public class LoginScreen extends AppCompatActivity {
     private GoogleSignInOptions gso;
     private Button google;
     private String EMAIL = "email";
+    private CallbackManager mcallbackManager;
+    private LoginButton loginButton;
+    private FirebaseAuth.AuthStateListener authStateListener;
+    private AccessTokenTracker accessTokenTracker;
 
 
 
@@ -46,10 +63,49 @@ public class LoginScreen extends AppCompatActivity {
         setContentView(R.layout.activity_login_screen);
         final TextView txtEmail= findViewById(R.id.textemail);
         final TextView enterPassword = findViewById(R.id.Password);
-        Button login = findViewById(R.id.button_login);
+        final Button login = findViewById(R.id.button_login);
         Button sign = findViewById(R.id. button_SignUp);
         mAuth = FirebaseAuth.getInstance();
         google=findViewById(R.id.buttonGoogle);
+        //FacebookSdk.sdkInitialize(getApplicationContext());
+        loginButton = findViewById(R.id.login_buttonfb);
+        //loginButton.setReadPermissions("email","public_profile");
+        loginButton.setPermissions(Collections.singletonList(EMAIL));
+        mcallbackManager = CallbackManager.Factory.create();
+        loginButton.setReadPermissions(Arrays.asList(EMAIL));
+
+        loginButton.registerCallback(mcallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.d(TAG,"onSuccess"+loginResult);
+                handleFacebookToken(loginResult.getAccessToken());
+
+
+
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                //App code 
+                 Log.w("Facebook", "" + error);
+
+            }
+        });
+        accessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+                if(currentAccessToken==null){
+                    mAuth.signOut();
+                }
+            }
+        };
+
+
 
 
 
@@ -100,20 +156,26 @@ public class LoginScreen extends AppCompatActivity {
                 }
             }
         });
+        authStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if(user!=null){
+                    startActivity(new Intent(getApplicationContext(),Insideapp.class));
+                }
+                else{
 
-    }
+                }
 
+            }
+        };
 
-    private void signIn() {
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
 
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mcallbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
@@ -132,6 +194,39 @@ public class LoginScreen extends AppCompatActivity {
             }
         }
     }
+
+    private void handleFacebookToken(AccessToken token){
+        Log.d(TAG,"handleFacebookToken"+token);
+
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        mAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+              if(task.isSuccessful()){
+                  Log.d(TAG,"sign in with crendentials: successful");
+                  FirebaseUser user = mAuth.getCurrentUser();
+                  startActivity(new Intent(getApplicationContext(),Insideapp.class));
+            }else {
+                  Log.d(TAG,"sign in with crendentials: fail",task.getException());
+                  Toast.makeText(LoginScreen.this,"Authentication Failed",Toast.LENGTH_SHORT).show();
+
+
+              }
+            }
+        });
+
+    }
+
+
+    private void signIn() {
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+
+    }
+
+
 
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
@@ -185,6 +280,7 @@ public class LoginScreen extends AppCompatActivity {
         if (mAuth.getCurrentUser()!=null){
             startActivity(new Intent(getApplicationContext(),Insideapp.class));
         }
+        mAuth.addAuthStateListener(authStateListener);
     }
 
     @Override
