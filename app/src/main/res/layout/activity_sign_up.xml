@@ -83,27 +83,32 @@
 
         <Button
             android:id="@+id/buttonGoogle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Button"
+            android:layout_weight="1"
             android:drawableLeft="@drawable/googleg_standard_color_18"
+            android:text="Google"
 
             />
+
 
         <Button
             android:id="@+id/buttonLinkedIn"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Linkedin"
-            android:drawableLeft="@drawable/googleg_standard_color_18"
+            android:layout_weight="1"
+            android:text="linkedin"
+
             />
+
         <Button
-            android:id="@+id/buttonFacebook"
+            android:id="@+id/login_buttonfb"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="Facebook"
-            android:drawableLeft="@drawable/googleg_standard_color_18"
-            />
+            android:layout_gravity="center_horizontal"
+            android:text="facebook"
+            android:drawableLeft="@drawable/com_facebook_favicon_blue"/>
 
 
 
